@@ -22,7 +22,7 @@ docker run --rm -v $(pwd):/config \
     --name datadog-cost-exporter \
     -e DD_API_KEY=${DD_API_KEY} \
     -e DD_APP_KEY=${DD_APP_KEY} \
-    claudeforlife/datadog-cost-exporter:latest --config.file=/config/exporter-config.yml
+    claudeforlife/datadog-cost-exporter:latest --config.file=/config/dd_cost_exporter_config.yaml
 ```
 
 ### Sample output
