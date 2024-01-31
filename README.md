@@ -42,4 +42,4 @@ Todo:
 
 #### Credits
 
-The `Datadog-cost-exporter` is inspired by [Azure-cost-exporter](https://github.com/opensourceelectrolux/azure-cost-exporter)
+The `Datadog-cost-exporter` is inspired by [Azure-cost-exporter](https://github.com/opensourceelectrolux/azure-cost-exporter) && [Aws-cost-exporter](https://github.com/opensourceelectrolux/aws-cost-exporter/tree/main)
