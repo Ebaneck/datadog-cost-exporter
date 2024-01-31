@@ -1,9 +1,6 @@
 # datadog-cost-exporter
-Exposing Datadog cost information as standard Prometheus metrics
 
-This tool is developed to streamline the aggregation of organizational cost-related metrics for users seeking to centralize and monitor their cost information.
-
-By leveraging Datadog APIs, this exporter fetches cost information and converts it into standard Prometheus metrics.
+This tool is developed to streamline the aggregation of organizational cost-related metrics for users seeking to centralize and monitor their cost information. By leveraging Datadog APIs, this exporter fetches cost information and converts it into standard Prometheus metrics.
 
 Future updates will introduce Grafana dashboards to enhance visualization and facilitate in-depth analysis of the exported data.
 
