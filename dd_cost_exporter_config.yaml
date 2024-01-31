@@ -1,5 +1,5 @@
 exporter_port: $EXPORTER_PORT|9091 # the port that exposes cost metrics
-polling_interval_seconds: $POLLING_INTERVAL_SECONDS|28800 # by default it is 8 hours because for daily cost, AWS only updates the data once per day
+polling_interval_seconds: $POLLING_INTERVAL_SECONDS|28800 # the interval in seconds between each cost polling
 
 dd_api_key: $DD_API_KEY # the Datadog API key
 dd_app_key: $DD_APP_KEY # the Datadog APP key
