@@ -1,4 +1,42 @@
 {
     "name": "datadog-cost-exporter",
-    "version": "v0.0.1"
+    "version": "1.0.0",
+    "author": "Claude Ebaneck <claudeforlife@gmail.com> (https://github.com/Ebaneck/datadog-cost-exporter)",
+    "homepage": "https://github.com/Ebaneck/datadog-cost-exporter",
+    "keywords": [
+      "datadog-cost-exporter",
+      "datadog",
+      "exporter",
+      "prometheus"
+    ],
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/Ebaneck/datadog-cost-exporter/issues"
+    },
+    "release": {
+      "plugins": [
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/release-notes-generator",
+        [
+          "@semantic-release/changelog",
+          {
+            "changelogFile": "CHANGELOG.md"
+          }
+        ],
+        [
+          "@semantic-release/git",
+          {
+            "assets": ["CHANGELOG.md"],
+            "message": "chore(release): ${nextRelease.version} \n\n${nextRelease.notes}"
+          }
+        ]
+      ]
+    },
+    "dependencies": {
+      "@semantic-release/changelog": "^6.0.1",
+      "@semantic-release": "^19.0.2",
+      "@semantic-release/commit-analyzer": "^9.0.2",
+      "@semantic-release/release-notes-generator": "^10.0.3",
+      "@semantic-release/git": "^10.0.1"
+    }
 }
