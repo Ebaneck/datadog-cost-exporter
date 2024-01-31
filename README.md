@@ -39,3 +39,7 @@ Todo:
   static_configs:
   - targets: ['localhost:9091']
 ```
+
+#### Credits
+
+The `Datadog-cost-exporter` is inspired by [Azure-cost-exporter](https://github.com/opensourceelectrolux/azure-cost-exporter)
