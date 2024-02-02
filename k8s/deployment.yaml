@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datadog-cost-exporter
+  labels:
+    app: datadog-cost-exporter
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: datadog-cost-exporter
+  template:
+    metadata:
+      labels:
+        app: datadog-cost-exporter
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9091'
+    spec:
+      containers:
+      - name: datadog-cost-exporter
+        image: "claudeforlife/datadog-cost-exporter:latest"
+        command: [ "python", "main.py", "-c", "/dd_cost_exporter_config.yaml" ]
+        imagePullPolicy: Always
+        env:
+        - name: DD_API_KEY 
+          valueFrom:
+            secretKeyRef:
+              name: datadog-cost-exporter
+              key: dd_api_key
+        - name: DD_APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: datadog-cost-exporter
+              key: dd_app_key
+        ports:
+        - name: metrics
+          containerPort: 9091
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: /dd_cost_exporter_config.yaml
+          subPath: dd_cost_exporter_config.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: datadog-cost-exporter-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datadog-cost-exporter
+  labels:
+    app: datadog-cost-exporter
+spec:
+  selector:
+    app: datadog-cost-exporter
+  ports:
+  - name: metrics
+    port: 9091
+    targetPort: 9091
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: datadog-cost-exporter
+  labels:
+    app: datadog-cost-exporter
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: datadog-cost-exporter 
+  endpoints:
+  - port: metrics
