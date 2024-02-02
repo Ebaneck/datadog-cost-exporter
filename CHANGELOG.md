@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.1.0...v1.2.0) (2024-02-02)
+
+
+### Features
+
+* add methods to add and define metrics ([#11](https://github.com/Ebaneck/datadog-cost-exporter/issues/11)) ([e68ca6b](https://github.com/Ebaneck/datadog-cost-exporter/commit/e68ca6b217fd7f3bdc3500a0b0fae63774fd62b4))
+
 # [1.1.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.0.0...v1.1.0) (2024-02-02)
 
 
