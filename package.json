@@ -9,7 +9,7 @@
       "exporter",
       "prometheus"
     ],
-    "license": "MIT",
+    "license": "Apache-2.0",
     "bugs": {
       "url": "https://github.com/Ebaneck/datadog-cost-exporter/issues"
     },
