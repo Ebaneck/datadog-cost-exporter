@@ -2,15 +2,17 @@
 # -*- coding:utf-8 -*-
 # Filename: main.py
 
+import logging
 import os
 import sys
-import logging
+from typing import Dict, Any
+
 from config.config import get_configs
-from src.exporter import MetricExporter
 from prometheus_client import start_http_server
+from src.exporter import MetricExporter
 
 
-def main(config):
+def main(config: Dict[str, Any]) -> None:
     app_metrics = MetricExporter(
         polling_interval_seconds=config["polling_interval_seconds"],
         dd_api_key=config["dd_api_key"],
