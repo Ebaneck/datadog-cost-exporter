@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.2.0...v1.3.0) (2024-02-03)
+
+
+### Features
+
+* add and consume cost endpoints ([#12](https://github.com/Ebaneck/datadog-cost-exporter/issues/12)) ([3bcf1ba](https://github.com/Ebaneck/datadog-cost-exporter/commit/3bcf1bad8f3a823eec2d30be1bc71e0ac16da6fe))
+
 # [1.2.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.1.0...v1.2.0) (2024-02-02)
 
 
