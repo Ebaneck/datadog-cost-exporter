@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.3.0...v1.3.1) (2024-02-03)
+
+
+### Bug Fixes
+
+* add python typings ([#14](https://github.com/Ebaneck/datadog-cost-exporter/issues/14)) ([554eeee](https://github.com/Ebaneck/datadog-cost-exporter/commit/554eeeebc2a5a7929aaf620ae487c7c9b9f4b7fa))
+
 # [1.3.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.2.0...v1.3.0) (2024-02-03)
 
 
