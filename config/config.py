@@ -1,11 +1,13 @@
-import os
-import sys
 import argparse
 import logging
+import os
+import sys
+from typing import Dict, Any
+
 from envyaml import EnvYAML
 
 
-def get_configs():
+def get_configs() -> Dict[str, Any]:
     parser = argparse.ArgumentParser(
         description="Datadog Cost Exporter, exposing Datadog cost data as Prometheus metrics."
     )
