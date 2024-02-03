@@ -3,8 +3,8 @@
 # -*- coding:utf-8 -*-
 # Filename: exporter.py
 
-import time
 import logging
+import time
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from typing import Any, Dict, Union
@@ -44,22 +44,24 @@ class MetricExporter:
         Defines the Prometheus metrics object.
         Returns a dictionary of metrics.
         """
-        self.metrics["config_sample_metric"] = Gauge(
-            "sample_metric",
-            "This is a sample metric for the Datadog exporter.",
-            labels=tuple(self.default_labels.keys()),
-        )
+        if "config_sample_metric" not in self.metrics:
+            self.metrics["config_sample_metric"] = Gauge(
+                "sample_metric",
+                "This is a sample metric for the Datadog exporter.",
+            )
         return self.metrics
 
-    def add_metrics(self, metrics, value=None):
+    def add_metrics(self, metrics={}, value=None):
         """
         Adds the retrieved metrics to the pre-defined object.
         metrics: dict
             A dictionary of Prometheus metric objects.
         """
-        metrics["config_sample_metric"].add_metric(
-            labels=tuple(self.default_labels.values()), value=None
-        )
+        for metric_name, metric_object in metrics.items():
+            if metric_name not in self.metrics:
+                self.metrics[metric_name] = metric_object
+            else:
+                logging.warning(f"Metric '{metric_name}' already added.")
 
     def run_metrics_loop(self):
         while True:
@@ -103,15 +105,14 @@ class MetricExporter:
                     projected_total_cost_metric = Gauge(
                         projected_total_cost_metric_name,
                         "The projected total cost for the month.",
-                        labels=["org_name", "public_id", "region", "date"],
                     )
                     self.metrics[
                         projected_total_cost_metric_name
                     ] = projected_total_cost_metric
 
-                projected_total_cost_metric.labels(org_name, public_id, region).set(
-                    attributes.projected_total_cost
-                )
+                projected_total_cost_metric.labels(
+                    org_name=org_name, public_id=public_id, region=region
+                ).set(attributes.projected_total_cost)
 
                 for charge in attributes.charges:
                     charge_type = charge.charge_type
@@ -126,18 +127,17 @@ class MetricExporter:
                         metric_object = Gauge(
                             charge_metric_name,
                             f"The projected cost for {product_name} charge.",
-                            labels=[
-                                "org_name",
-                                "public_id",
-                                "region",
-                                "charge_type",
-                                "date",
-                            ],
                         )
                         self.metrics[charge_metric_name] = metric_object
 
-                    labels = [org_name, public_id, region, charge.charge_type]
-                    metric_object.labels(*labels).set(charge.cost)
+                    labels = {
+                        "org_name": org_name,
+                        "public_id": public_id,
+                        "region": region,
+                        "charge_type": charge.charge_type,
+                        "date": date,
+                    }
+                    metric_object.labels(**labels).set(charge.cost)
         except Exception as e:
             logging.error(f"Error querying Datadog projected cost endpoint: {e}")
             return None
@@ -169,17 +169,19 @@ class MetricExporter:
                         metric_object = Gauge(
                             charge_metric_name,
                             f"The historical cost for {product_name} charge.",
-                            labels=[
-                                "org_name",
-                                "public_id",
-                                "region",
-                                "charge_type",
-                                "date",
-                            ],
                         )
                         self.metrics[charge_metric_name] = metric_object
-                    labels = [org_name, public_id, region, charge_type, date]
-                    metric_object.labels(*labels).set(charge_cost)
+
+                    labels = (
+                        {
+                            "org_name": org_name,
+                            "public_id": public_id,
+                            "region": region,
+                            "charge_type": charge_type,
+                            "date": date,
+                        },
+                    )
+                    metric_object.labels(**labels).set(charge_cost)
         except Exception as e:
             logging.error(f"Error handling historical cost by organization: {e}")
             return None
@@ -210,13 +212,15 @@ class MetricExporter:
                         metric_object = Gauge(
                             tag_metric_name,
                             f"The monthly cost attribution for {field} tag.",
-                            labels=["org_name", "public_id", "date"],
                         )
                         self.metrics[tag_metric_name] = metric_object
-
+                    labels = {
+                        "org_name": org_name,
+                        "public_id": public_id,
+                        "date": date,
+                    }
                     # Set the value for the metric
-                    labels = [org_name, public_id, date]
-                    metric_object.labels(*labels).set(value)
+                    metric_object.labels(**labels).set(value)
 
             for aggregate in monthlyCostAttributionResponse.get("meta", {}).get(
                 "aggregates", []
@@ -233,12 +237,14 @@ class MetricExporter:
                     metric_object = Gauge(
                         aggregate_metric_name,
                         f"The monthly aggregate value for {field}.",
-                        labels=["agg_type"],
                     )
                     self.metrics[aggregate_metric_name] = metric_object
 
+                labels = {
+                    "agg_type": agg_type,
+                }
                 # Set the value for the metric
-                metric_object.labels(agg_type).set(value)
+                metric_object.labels(**agg_type).set(value)
 
         except Exception as e:
             logging.error(f"Error handling monthly cost attribution: {e}")
@@ -246,7 +252,7 @@ class MetricExporter:
 
     def fetch(self):
         """
-        Fetch the metrics from the Datadog API and yield them.
+        Fetch the metrics from the Datadog API.
         """
         logger.info("Collecting the metrics for a Prometheus client")
 
@@ -257,6 +263,6 @@ class MetricExporter:
         self.get_monthly_cost_attribution(api_instance)
 
         metric_definitions = self.define_metrics()
-        self.add_metrics(metric_definitions, response)
+        self.add_metrics(metric_definitions, {})
 
-        yield from metric_definitions.values()
+        # yield from metric_definitions.values()
