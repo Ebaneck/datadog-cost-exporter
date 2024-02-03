@@ -7,9 +7,14 @@ from envyaml import EnvYAML
 
 def get_configs():
     parser = argparse.ArgumentParser(
-        description="Datadog Cost Exporter, exposing Datadog cost data as Prometheus metrics.")
-    parser.add_argument("-c", "--config", required=True,
-                        help="The config file (dd_cost_exporter_config.yaml) for the exporter")
+        description="Datadog Cost Exporter, exposing Datadog cost data as Prometheus metrics."
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        required=True,
+        help="The config file (dd_cost_exporter_config.yaml) for the exporter",
+    )
     args = parser.parse_args()
 
     if not os.path.exists(args.config):

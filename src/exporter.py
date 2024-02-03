@@ -1,4 +1,4 @@
-''' DD exporter for prometheus '''
+""" DD exporter for prometheus """
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 # Filename: exporter.py
@@ -21,21 +21,17 @@ from prometheus_client import (
     Info,
 )
 
-logger = logging.getLogger('datadog-cost-exporter')
+logger = logging.getLogger("datadog-cost-exporter")
+
 
 class MetricExporter:
-    '''
-        Usage data is delayed by up to 72 hours from when it was incurred. 
-        It is retained for 15 months.
-        https://datadog-api-client.readthedocs.io/en/latest/datadog_api_client.v2.api.html#module-datadog_api_client.v2.api.usage_metering_api
-    '''
-    def __init__(
-        self,
-        polling_interval_seconds,
-        dd_api_key,
-        dd_app_key,
-        dd_host
-    ):
+    """
+    Usage data is delayed by up to 72 hours from when it was incurred.
+    It is retained for 15 months.
+    https://datadog-api-client.readthedocs.io/en/latest/datadog_api_client.v2.api.html#module-datadog_api_client.v2.api.usage_metering_api
+    """
+
+    def __init__(self, polling_interval_seconds, dd_api_key, dd_app_key, dd_host):
         self.polling_interval_seconds = polling_interval_seconds
         self.dd_api_key = dd_api_key
         self.dd_app_key = dd_app_key
@@ -45,16 +41,16 @@ class MetricExporter:
 
     def define_metrics(self):
         """
-        Defines the Prometheus metrics object. 
+        Defines the Prometheus metrics object.
         Returns a dictionary of metrics.
         """
         self.metrics["config_sample_metric"] = Gauge(
             "sample_metric",
             "This is a sample metric for the Datadog exporter.",
-            labels=tuple(self.default_labels.keys())
+            labels=tuple(self.default_labels.keys()),
         )
         return self.metrics
-    
+
     def add_metrics(self, metrics, value=None):
         """
         Adds the retrieved metrics to the pre-defined object.
@@ -62,8 +58,7 @@ class MetricExporter:
             A dictionary of Prometheus metric objects.
         """
         metrics["config_sample_metric"].add_metric(
-            labels=tuple(self.default_labels.values()),
-            value=None
+            labels=tuple(self.default_labels.values()), value=None
         )
 
     def run_metrics_loop(self):
@@ -84,7 +79,9 @@ class MetricExporter:
             api_instance = UsageMeteringApi(api_client)
             return api_instance
 
-    def get_projected_total_cost(self, api_instance: Any) -> Union[None, ProjectedCostResponse]:
+    def get_projected_total_cost(
+        self, api_instance: Any
+    ) -> Union[None, ProjectedCostResponse]:
         try:
             projectedCostResponse = api_instance.get_projected_monthly_cost()
 
@@ -99,16 +96,22 @@ class MetricExporter:
 
                 projected_total_cost_metric_name = "projected_total_cost"
                 if projected_total_cost_metric_name in self.metrics:
-                    projected_total_cost_metric = self.metrics[projected_total_cost_metric_name]
+                    projected_total_cost_metric = self.metrics[
+                        projected_total_cost_metric_name
+                    ]
                 else:
                     projected_total_cost_metric = Gauge(
                         projected_total_cost_metric_name,
                         "The projected total cost for the month.",
-                        labels=["org_name", "public_id", "region", "date"]
+                        labels=["org_name", "public_id", "region", "date"],
                     )
-                    self.metrics[projected_total_cost_metric_name] = projected_total_cost_metric
+                    self.metrics[
+                        projected_total_cost_metric_name
+                    ] = projected_total_cost_metric
 
-                projected_total_cost_metric.labels(org_name, public_id, region).set(attributes.projected_total_cost)
+                projected_total_cost_metric.labels(org_name, public_id, region).set(
+                    attributes.projected_total_cost
+                )
 
                 for charge in attributes.charges:
                     charge_type = charge.charge_type
@@ -123,7 +126,13 @@ class MetricExporter:
                         metric_object = Gauge(
                             charge_metric_name,
                             f"The projected cost for {product_name} charge.",
-                            labels=["org_name", "public_id", "region", "charge_type", "date"]
+                            labels=[
+                                "org_name",
+                                "public_id",
+                                "region",
+                                "charge_type",
+                                "date",
+                            ],
                         )
                         self.metrics[charge_metric_name] = metric_object
 
@@ -160,7 +169,13 @@ class MetricExporter:
                         metric_object = Gauge(
                             charge_metric_name,
                             f"The historical cost for {product_name} charge.",
-                            labels=["org_name", "public_id", "region", "charge_type", "date"]
+                            labels=[
+                                "org_name",
+                                "public_id",
+                                "region",
+                                "charge_type",
+                                "date",
+                            ],
                         )
                         self.metrics[charge_metric_name] = metric_object
                     labels = [org_name, public_id, region, charge_type, date]
@@ -172,7 +187,9 @@ class MetricExporter:
     def get_monthly_cost_attribution(self, api_instance: Any) -> None:
         try:
             # Get monthly cost attribution
-            monthlyCostAttributionResponse: Dict[str, Any] = api_instance.get_monthly_cost_attribution(
+            monthlyCostAttributionResponse: Dict[
+                str, Any
+            ] = api_instance.get_monthly_cost_attribution(
                 start_month=(datetime.now() + relativedelta(days=-5)),
                 end_month=(datetime.now() + relativedelta(days=-3)),
                 fields="*",
@@ -193,7 +210,7 @@ class MetricExporter:
                         metric_object = Gauge(
                             tag_metric_name,
                             f"The monthly cost attribution for {field} tag.",
-                            labels=["org_name", "public_id", "date"]
+                            labels=["org_name", "public_id", "date"],
                         )
                         self.metrics[tag_metric_name] = metric_object
 
@@ -201,20 +218,22 @@ class MetricExporter:
                     labels = [org_name, public_id, date]
                     metric_object.labels(*labels).set(value)
 
-            for aggregate in monthlyCostAttributionResponse.get("meta", {}).get("aggregates", []):
+            for aggregate in monthlyCostAttributionResponse.get("meta", {}).get(
+                "aggregates", []
+            ):
                 agg_type = aggregate.get("agg_type", "")
                 field = aggregate.get("field", "")
                 value = aggregate.get("value", "")
 
                 aggregate_metric_name = f"monthly_cost_aggregate_{field}"
-                
+
                 if aggregate_metric_name in self.metrics:
                     metric_object = self.metrics[aggregate_metric_name]
                 else:
                     metric_object = Gauge(
                         aggregate_metric_name,
                         f"The monthly aggregate value for {field}.",
-                        labels=["agg_type"]
+                        labels=["agg_type"],
                     )
                     self.metrics[aggregate_metric_name] = metric_object
 
@@ -230,7 +249,7 @@ class MetricExporter:
         Fetch the metrics from the Datadog API and yield them.
         """
         logger.info("Collecting the metrics for a Prometheus client")
-        
+
         api_instance = self.get_api_instance()
 
         self.get_projected_total_cost(api_instance)
