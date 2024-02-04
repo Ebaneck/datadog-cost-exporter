@@ -13,6 +13,7 @@ class TestMetricExporter(unittest.TestCase):
             dd_api_key="your_api_key",
             dd_app_key="your_app_key",
             dd_host="your_dd_host",
+            dd_debug=False,
         )
 
     @patch("src.exporter.time.sleep", side_effect=InterruptedError)
