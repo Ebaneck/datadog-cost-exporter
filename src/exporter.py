@@ -31,11 +31,14 @@ class MetricExporter:
     https://datadog-api-client.readthedocs.io/en/latest/datadog_api_client.v2.api.html#module-datadog_api_client.v2.api.usage_metering_api
     """
 
-    def __init__(self, polling_interval_seconds, dd_api_key, dd_app_key, dd_host):
+    def __init__(
+        self, polling_interval_seconds, dd_api_key, dd_app_key, dd_host, dd_debug
+    ):
         self.polling_interval_seconds = polling_interval_seconds
         self.dd_api_key = dd_api_key
         self.dd_app_key = dd_app_key
         self.dd_host = dd_host
+        self.dd_debug = dd_debug
         self.default_labels = {}
         self.metrics = {}
 
@@ -77,6 +80,8 @@ class MetricExporter:
         configuration.unstable_operations["get_monthly_cost_attribution"] = True
         configuration.api_key["appKeyAuth"] = self.dd_app_key
         configuration.api_key["apiKeyAuth"] = self.dd_api_key
+        configuration.debug = self.dd_debug
+        configuration.server_variables["site"] = self.dd_host
         with ApiClient(configuration=configuration) as api_client:
             api_instance = UsageMeteringApi(api_client)
             return api_instance
@@ -85,7 +90,7 @@ class MetricExporter:
         self, api_instance: Any
     ) -> Union[None, ProjectedCostResponse]:
         try:
-            projectedCostResponse = api_instance.get_projected_monthly_cost()
+            projectedCostResponse = api_instance.get_projected_cost()
 
             for projected_cost_data in projectedCostResponse.data:
                 attributes = projected_cost_data.attributes
