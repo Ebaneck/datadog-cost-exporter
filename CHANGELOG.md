@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.4.0...v1.5.0) (2024-02-04)
+
+
+### Features
+
+* enable datadog client debug mode ([#19](https://github.com/Ebaneck/datadog-cost-exporter/issues/19)) ([baf5794](https://github.com/Ebaneck/datadog-cost-exporter/commit/baf57940ac6c0883ce2abcd01f25952d40a575db))
+
 # [1.4.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.3.2...v1.4.0) (2024-02-04)
 
 
