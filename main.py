@@ -18,6 +18,7 @@ def main(config: Dict[str, Any]) -> None:
         dd_api_key=config["dd_api_key"],
         dd_app_key=config["dd_app_key"],
         dd_host=config["dd_host"],
+        dd_debug=config["dd_debug"],
     )
     start_http_server(config["exporter_port"])
     app_metrics.run_metrics_loop()
