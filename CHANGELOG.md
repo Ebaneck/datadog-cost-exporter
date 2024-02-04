@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.5.0...v1.5.1) (2024-02-04)
+
+
+### Bug Fixes
+
+* adjust test cases to pass ([#20](https://github.com/Ebaneck/datadog-cost-exporter/issues/20)) ([b6d9fb5](https://github.com/Ebaneck/datadog-cost-exporter/commit/b6d9fb585b759af01b95197fee825b10c3384707))
+
 # [1.5.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.4.0...v1.5.0) (2024-02-04)
 
 
