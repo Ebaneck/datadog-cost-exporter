@@ -1,5 +1,7 @@
 # datadog-cost-exporter
 
+[![Coverage Status](https://coveralls.io/repos/github/Ebaneck/datadog-cost-exporter/badge.svg?branch=main)](https://coveralls.io/github/Ebaneck/datadog-cost-exporter?branch=main)
+
 This tool is developed to streamline the aggregation of organizational cost-related metrics for users seeking to centralize and monitor their cost information. By leveraging Datadog APIs, this exporter fetches cost information and converts it into standard Prometheus metrics.
 
 Future updates will introduce Grafana dashboards to enhance visualization and facilitate in-depth analysis of the exported data.
