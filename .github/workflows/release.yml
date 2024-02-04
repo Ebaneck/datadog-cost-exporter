@@ -1,4 +1,4 @@
-name: "Create release, build and push Docker image"
+name: "Docker Build & Release"
 
 on:
   workflow_dispatch:
