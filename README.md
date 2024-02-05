@@ -1,5 +1,5 @@
 # datadog-cost-exporter
-[![Docker Build & Release](https://github.com/Ebaneck/datadog-cost-exporter/actions/workflows/release.yml/badge.svg)](https://github.com/Ebaneck/datadog-cost-exporter/actions/workflows/release.yml) ![GitHub Tag](https://img.shields.io/github/v/tag/Ebaneck/datadog-cost-exporter) [![Coverage Status](https://coveralls.io/repos/github/Ebaneck/datadog-cost-exporter/badge.svg?branch=main)](https://coveralls.io/github/Ebaneck/datadog-cost-exporter?branch=main)
+[![Docker Build & Release](https://github.com/Ebaneck/datadog-cost-exporter/actions/workflows/release.yml/badge.svg)](https://github.com/Ebaneck/datadog-cost-exporter/actions/workflows/release.yml) ![GitHub Tag](https://img.shields.io/github/v/tag/Ebaneck/datadog-cost-exporter) [![Pre-merge checks](https://github.com/Ebaneck/datadog-cost-exporter/actions/workflows/pr.yml/badge.svg)](https://github.com/Ebaneck/datadog-cost-exporter/actions/workflows/pr.yml) [![Coverage Status](https://coveralls.io/repos/github/Ebaneck/datadog-cost-exporter/badge.svg?branch=main)](https://coveralls.io/github/Ebaneck/datadog-cost-exporter?branch=main)
 
 This tool is developed to streamline the aggregation of organizational cost-related metrics for users seeking to centralize and monitor their cost information. By leveraging Datadog APIs, this exporter fetches cost information and converts it into standard Prometheus metrics.
 
@@ -25,7 +25,14 @@ docker run --rm -v $(pwd):/config \
 
 ### Sample output
 
-Todo:
+```
+projected_total_cost{org_name="my-org",public_id="random-uuid",region="eu"} 0.0
+# HELP projected_charge_cost_apm_host The projected cost for apm_host charge.
+# TYPE projected_charge_cost_apm_host gauge
+# TYPE historical_charge_cost_apm_host gauge
+historical_charge_cost_apm_host{charge_type="committed",date="2023-12-01 00:00:00+00:00",org_name="my-org",public_id="random-uuid",region="eu"} 5108.07
+historical_charge_cost_ingested_spans{charge_type="on_demand",date="2023-12-01 00:00:00+00:00",org_name="my-org",public_id="random-uuid",region="eu"} 1916.5
+```
 
 ### Prometheus configuration
 
@@ -33,7 +40,6 @@ Todo:
 - job_name: 'datadog-cost-exporter'
   metrics_path: '/metrics'
   scrape_timeout: 60s
-  scrape_interval: 1800s
   static_configs:
   - targets: ['localhost:9091']
 ```
