@@ -99,7 +99,7 @@ class MetricExporter:
                 public_id = attributes.public_id
                 region = attributes.region
                 projected_total_cost = attributes.projected_total_cost
-                date = parse(attributes.date).strftime("%Y-%m-%d")
+                date = attributes.date
 
                 projected_total_cost_metric_name = "projected_total_cost"
                 if projected_total_cost_metric_name in self.metrics:
@@ -110,6 +110,7 @@ class MetricExporter:
                     projected_total_cost_metric = Gauge(
                         projected_total_cost_metric_name,
                         "The projected total cost for the month.",
+                        ["org_name", "public_id", "region"],
                     )
                     self.metrics[
                         projected_total_cost_metric_name
@@ -132,6 +133,7 @@ class MetricExporter:
                         metric_object = Gauge(
                             charge_metric_name,
                             f"The projected cost for {product_name} charge.",
+                            ["org_name", "public_id", "region", "charge_type", "date"],
                         )
                         self.metrics[charge_metric_name] = metric_object
 
@@ -159,7 +161,7 @@ class MetricExporter:
                 org_name = attributes.get("org_name", "")
                 public_id = attributes.get("public_id", "")
                 region = attributes.get("region", "")
-                date = parse(attributes.get("date", "")).strftime("%Y-%m-%d")
+                date = attributes.get("date", "")
 
                 for charge in attributes.get("charges", []):
                     product_name = charge.get("product_name", "")
@@ -174,18 +176,18 @@ class MetricExporter:
                         metric_object = Gauge(
                             charge_metric_name,
                             f"The historical cost for {product_name} charge.",
+                            ["org_name", "public_id", "region", "charge_type", "date"],
                         )
                         self.metrics[charge_metric_name] = metric_object
 
-                    labels = (
-                        {
-                            "org_name": org_name,
-                            "public_id": public_id,
-                            "region": region,
-                            "charge_type": charge_type,
-                            "date": date,
-                        },
-                    )
+                    labels = {
+                        "org_name": org_name,
+                        "public_id": public_id,
+                        "region": region,
+                        "charge_type": charge_type,
+                        "date": date,
+                    }
+                    
                     metric_object.labels(**labels).set(charge_cost)
         except Exception as e:
             logging.error(f"Error handling historical cost by organization: {e}")
@@ -206,7 +208,7 @@ class MetricExporter:
                 attributes = cost_data.get("attributes", {})
                 org_name = attributes.get("org_name", "")
                 public_id = attributes.get("public_id", "")
-                date = parse(attributes.get("month", "")).strftime("%Y-%m-%d")
+                date = attributes.get("month", "")
 
                 for field, value in attributes.get("values", {}).items():
                     tag_metric_name = f"monthly_cost_attribution_{field}"
@@ -217,6 +219,7 @@ class MetricExporter:
                         metric_object = Gauge(
                             tag_metric_name,
                             f"The monthly cost attribution for {field} tag.",
+                            ["org_name", "public_id", "date"],
                         )
                         self.metrics[tag_metric_name] = metric_object
                     labels = {
@@ -242,6 +245,7 @@ class MetricExporter:
                     metric_object = Gauge(
                         aggregate_metric_name,
                         f"The monthly aggregate value for {field}.",
+                        ["agg_type"],
                     )
                     self.metrics[aggregate_metric_name] = metric_object
 
