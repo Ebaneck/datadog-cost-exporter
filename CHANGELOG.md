@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.5.2...v1.5.3) (2024-02-08)
+
+
+### Bug Fixes
+
+* resolve typos errors ([#25](https://github.com/Ebaneck/datadog-cost-exporter/issues/25)) ([ce7c2b6](https://github.com/Ebaneck/datadog-cost-exporter/commit/ce7c2b6856671197201e7ed6fcd192bcc4b2c234))
+
 ## [1.5.2](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.5.1...v1.5.2) (2024-02-05)
 
 
