@@ -7,10 +7,11 @@ import logging
 import time
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 from datadog_api_client import ApiClient, Configuration
 from datadog_api_client.v2.api.usage_metering_api import UsageMeteringApi
+from datadog_api_client.v2.api.spans_metrics_api import SpansMetricsApi
 from datadog_api_client.v2.model.projected_cost_response import ProjectedCostResponse
 
 from prometheus_client import (
@@ -42,7 +43,24 @@ class MetricExporter:
         self.default_labels = {}
         self.metrics = {}
 
-    def define_metrics(self):
+    def create_api_client(self) -> ApiClient:
+        configuration = Configuration()
+        configuration.unstable_operations["get_monthly_cost_attribution"] = True
+        configuration.api_key["appKeyAuth"] = self.dd_app_key
+        configuration.api_key["apiKeyAuth"] = self.dd_api_key
+        configuration.debug = self.dd_debug
+        configuration.server_variables["site"] = self.dd_host
+        return ApiClient(configuration=configuration)
+
+    def get_usage_metric_api_instance(self) -> UsageMeteringApi:
+        with self.create_api_client() as api_client:
+            return UsageMeteringApi(api_client)
+
+    def get_spans_metrics_api_instance(self) -> SpansMetricsApi:
+        with self.create_api_client() as api_client:
+            return SpansMetricsApi(api_client)
+
+    def define_metrics(self) -> Dict[str, Gauge]:
         """
         Defines the Prometheus metrics object.
         Returns a dictionary of metrics.
@@ -54,7 +72,9 @@ class MetricExporter:
             )
         return self.metrics
 
-    def add_metrics(self, metrics={}, value=None):
+    def add_metrics(
+        self, metrics: Dict[str, Any] = {}, value: Optional[Any] = None
+    ) -> None:
         """
         Adds the retrieved metrics to the pre-defined object.
         metrics: dict
@@ -74,17 +94,6 @@ class MetricExporter:
                 logging.error(e)
                 continue
             time.sleep(self.polling_interval_seconds)
-
-    def get_api_instance(self):
-        configuration = Configuration()
-        configuration.unstable_operations["get_monthly_cost_attribution"] = True
-        configuration.api_key["appKeyAuth"] = self.dd_app_key
-        configuration.api_key["apiKeyAuth"] = self.dd_api_key
-        configuration.debug = self.dd_debug
-        configuration.server_variables["site"] = self.dd_host
-        with ApiClient(configuration=configuration) as api_client:
-            api_instance = UsageMeteringApi(api_client)
-            return api_instance
 
     def get_projected_total_cost(
         self, api_instance: Any
@@ -187,7 +196,7 @@ class MetricExporter:
                         "charge_type": charge_type,
                         "date": date,
                     }
-                    
+
                     metric_object.labels(**labels).set(charge_cost)
         except Exception as e:
             logging.error(f"Error handling historical cost by organization: {e}")
@@ -265,11 +274,11 @@ class MetricExporter:
         """
         logger.info("Collecting the metrics for a Prometheus client")
 
-        api_instance = self.get_api_instance()
+        usage_metric_api_instance = self.get_usage_metric_api_instance()
 
-        self.get_projected_total_cost(api_instance)
-        self.get_historical_cost_by_org(api_instance)
-        self.get_monthly_cost_attribution(api_instance)
+        self.get_projected_total_cost(usage_metric_api_instance)
+        self.get_historical_cost_by_org(usage_metric_api_instance)
+        self.get_monthly_cost_attribution(usage_metric_api_instance)
 
         metric_definitions = self.define_metrics()
         self.add_metrics(metric_definitions, {})
