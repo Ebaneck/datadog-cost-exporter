@@ -14,7 +14,11 @@ class TestMetricExporter(unittest.TestCase):
         self.dd_debug = True
         self.polling_interval_seconds = 60
         self.metric_exporter = MetricExporter(
-            self.polling_interval_seconds, self.dd_api_key, self.dd_app_key, self.dd_host, self.dd_debug
+            self.polling_interval_seconds,
+            self.dd_api_key,
+            self.dd_app_key,
+            self.dd_host,
+            self.dd_debug,
         )
 
     def test_create_api_client(self):

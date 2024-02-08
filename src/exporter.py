@@ -28,8 +28,7 @@ logger = logging.getLogger("datadog-cost-exporter")
 class MetricExporter:
     """
     Usage data is delayed by up to 72 hours from when it was incurred.
-    It is retained for 15 months.
-    https://datadog-api-client.readthedocs.io/en/latest/datadog_api_client.v2.api.html#module-datadog_api_client.v2.api.usage_metering_api
+    NB: It is retained for 15 months.
     """
 
     def __init__(
@@ -270,9 +269,9 @@ class MetricExporter:
 
     def fetch(self):
         """
-        Fetch the metrics from the Datadog API.
+        Fetch metrics from the Datadog API.
         """
-        logger.info("Collecting the metrics for a Prometheus client")
+        logger.info("Collecting metrics for a Prometheus client")
 
         usage_metric_api_instance = self.get_usage_metric_api_instance()
 
