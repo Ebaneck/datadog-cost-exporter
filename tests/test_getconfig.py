@@ -36,9 +36,7 @@ class TestGetConfigs(unittest.TestCase):
             with self.assertRaises(SystemExit) as cm:
                 get_configs()
 
-            self.assertEqual(
-                cm.exception.code, 1
-            )  # Ensure that the program exits with code 1
+            self.assertEqual(cm.exception.code, 1)
 
 
 if __name__ == "__main__":
