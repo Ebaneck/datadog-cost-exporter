@@ -95,7 +95,7 @@ class MetricExporter:
             time.sleep(self.polling_interval_seconds)
 
     def get_projected_total_cost(
-        self, api_instance: Any
+        self, api_instance: UsageMeteringApi
     ) -> Union[None, ProjectedCostResponse]:
         try:
             projectedCostResponse = api_instance.get_projected_cost()
@@ -157,7 +157,7 @@ class MetricExporter:
             logging.error(f"Error querying Datadog projected cost endpoint: {e}")
             return None
 
-    def get_historical_cost_by_org(self, api_instance: Any) -> None:
+    def get_historical_cost_by_org(self, api_instance: UsageMeteringApi) -> None:
         try:
             costByOrgResponse: Dict[str, Any] = api_instance.get_historical_cost_by_org(
                 view="summary",
@@ -201,7 +201,7 @@ class MetricExporter:
             logging.error(f"Error handling historical cost by organization: {e}")
             return None
 
-    def get_monthly_cost_attribution(self, api_instance: Any) -> None:
+    def get_monthly_cost_attribution(self, api_instance: UsageMeteringApi) -> None:
         try:
             # Get monthly cost attribution
             monthlyCostAttributionResponse: Dict[
