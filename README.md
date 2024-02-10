@@ -45,6 +45,16 @@ historical_charge_cost_ingested_spans{charge_type="on_demand",date="2023-12-01 0
   - targets: ['localhost:9091']
 ```
 
+### Contributing
+
+Contributions are what makes the open-source community an amazing place to learn, inspire, and create. 
+
+Please try to create bug reports that:
+
+- Include steps to reproduce the problem.
+- Include as much detail as possible.
+- Do not duplicate existing opened issues.
+
 #### Credits
 
 The `Datadog-cost-exporter` is inspired by [Azure-cost-exporter](https://github.com/opensourceelectrolux/azure-cost-exporter) && [Aws-cost-exporter](https://github.com/opensourceelectrolux/aws-cost-exporter/tree/main)
