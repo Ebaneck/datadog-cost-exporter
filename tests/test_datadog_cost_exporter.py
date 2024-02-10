@@ -2,6 +2,9 @@ import unittest
 from unittest.mock import MagicMock, Mock, patch
 from datetime import datetime
 from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
+
+from freezegun import freeze_time
 
 from src.exporter import MetricExporter
 
@@ -82,8 +85,35 @@ class TestMetricExporter(unittest.TestCase):
 
         self.metric_exporter.get_projected_total_cost(mock_api_instance)
 
-    # Add more test cases as needed
+    @patch('src.exporter.UsageMeteringApi')
+    @patch('src.exporter.Gauge')
+    @freeze_time("2024-01-01")
+    def test_fetch(self, mock_gauge, mock_usage_metering_api):
+        api_instance = mock_usage_metering_api.return_value
+        self_instance = MetricExporter(
+            polling_interval_seconds=60,
+            dd_api_key='fake_api_key',
+            dd_app_key='fake_app_key',
+            dd_host='fake_host',
+            dd_debug=True
+        )
 
+        api_instance.get_projected_cost.return_value = MagicMock()
+        api_instance.get_historical_cost_by_org.return_value = {'data': []}
+        api_instance.get_monthly_cost_attribution.return_value = {'data': [], 'meta': {'aggregates': []}}
+
+        self_instance.fetch()
+
+        api_instance.get_historical_cost_by_org.assert_called_once_with(
+            view='summary',
+            start_month=(datetime.now() + relativedelta(months=-2)),
+        )
+        api_instance.get_monthly_cost_attribution.assert_called_once_with(
+            start_month=(datetime.now() + relativedelta(days=-5)),
+            end_month=(datetime.now() + relativedelta(days=-3)),
+            fields="*",
+        )
+        mock_gauge.assert_called()
 
 if __name__ == "__main__":
     unittest.main()
