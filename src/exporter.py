@@ -10,8 +10,15 @@ from dateutil.relativedelta import relativedelta
 from typing import Any, Dict, Optional, Union
 
 from datadog_api_client import ApiClient, Configuration
+from datadog_api_client.v1.api.usage_metering_api import (
+    UsageMeteringApi as V1UsageMeteringApi,
+)
+from datadog_api_client.v1.model.monthly_usage_attribution_supported_metrics import (
+    MonthlyUsageAttributionSupportedMetrics,
+)
 from datadog_api_client.v2.api.usage_metering_api import UsageMeteringApi
 from datadog_api_client.v2.api.spans_metrics_api import SpansMetricsApi
+from datadog_api_client.v1.api.metrics_api import MetricsApi as V1MetricsApi
 from datadog_api_client.v2.model.projected_cost_response import ProjectedCostResponse
 
 from prometheus_client import (
@@ -55,9 +62,17 @@ class MetricExporter:
         with self.create_api_client() as api_client:
             return UsageMeteringApi(api_client)
 
+    def get_v1_usage_metric_api_instance(self) -> V1UsageMeteringApi:
+        with self.create_api_client() as api_client:
+            return V1UsageMeteringApi(api_client)
+
     def get_spans_metrics_api_instance(self) -> SpansMetricsApi:
         with self.create_api_client() as api_client:
             return SpansMetricsApi(api_client)
+
+    def get_v1_metrics_api_instance(self) -> V1MetricsApi:
+        with self.create_api_client() as api_client:
+            return V1MetricsApi(api_client)
 
     def define_metrics(self) -> Dict[str, Gauge]:
         """
@@ -201,13 +216,15 @@ class MetricExporter:
             logging.error(f"Error handling historical cost by organization: {e}")
             return None
 
-    def get_monthly_cost_attribution(self, api_instance: UsageMeteringApi) -> None:
+    def get_monthly_cost_attribution(self, api_instance: V1UsageMeteringApi) -> None:
         try:
             # Get monthly cost attribution
             monthlyCostAttributionResponse: Dict[
                 str, Any
-            ] = api_instance.get_monthly_cost_attribution(
-                start_month=(datetime.now() + relativedelta(days=-5)),
+            ] = api_instance.get_monthly_usage_attribution(
+                start_month=(datetime.now() + relativedelta(days=-3)).isoformat(
+                    timespec="seconds"
+                ),
                 end_month=(datetime.now() + relativedelta(days=-3)),
                 fields="*",
             )
@@ -267,6 +284,78 @@ class MetricExporter:
             logging.error(f"Error handling monthly cost attribution: {e}")
             return None
 
+    def _query_timeseries_points(
+        self, query, fr: datetime, to: datetime, api_instance: V1MetricsApi
+    ) -> None:
+        """
+        Query the Datadog API for timeseries points.
+        See: https://docs.datadoghq.com/account_management/billing/usage_metrics/#types-of-usage
+        """
+        try:
+            response = api_instance.query_metrics(
+                _from=int(fr.timestamp()),
+                to=int(to.timestamp()),
+                query=query,
+            )
+        except Exception as e:
+            logging.error(f"Error handling metrics list: {e}")
+            return None
+
+    def get_usage_this_month(self, api_instance: V1MetricsApi) -> None:
+        """
+        Get the amount of logs ingested this month.
+        """
+        current_time = datetime.now()
+        first_day_of_month = datetime.today().replace(day=1)
+
+        # ingested spans
+        self._query_timeseries_points(
+            "sum:datadog.estimated_usage.apm.ingested_bytes{*} by {service, env}",
+            first_day_of_month,
+            current_time,
+            api_instance,
+        )
+
+        # index spans
+        self._query_timeseries_points(
+            "sum:datadog.estimated_usage.apm.ingested_spans{*} by {service, env}",
+            first_day_of_month,
+            current_time,
+            api_instance,
+        )
+
+        # ingested logs
+        self._query_timeseries_points(
+            "sum:datadog.estimated_usage.logs.ingested_bytes{*} by {service, env}",
+            first_day_of_month,
+            current_time,
+            api_instance,
+        )
+
+        # index logs
+        self._query_timeseries_points(
+            "sum:datadog.estimated_usage.logs.ingested_events{*} by {service, env}",
+            first_day_of_month,
+            current_time,
+            api_instance,
+        )
+
+        # infra host
+        self._query_timeseries_points(
+            "sum:datadog.estimated_usage.hosts{*} by {service, env}",
+            first_day_of_month,
+            current_time,
+            api_instance,
+        )
+
+        # rum sessions
+        self._query_timeseries_points(
+            "sum:datadog.estimated_usage.rum.sessions{*} by {service, env}",
+            first_day_of_month,
+            current_time,
+            api_instance,
+        )
+
     def fetch(self):
         """
         Fetch metrics from the Datadog API.
@@ -274,10 +363,14 @@ class MetricExporter:
         logger.info("Collecting metrics for a Prometheus client")
 
         usage_metric_api_instance = self.get_usage_metric_api_instance()
-
         self.get_projected_total_cost(usage_metric_api_instance)
         self.get_historical_cost_by_org(usage_metric_api_instance)
-        self.get_monthly_cost_attribution(usage_metric_api_instance)
+
+        usage_metric_api_instance_v1 = self.get_v1_usage_metric_api_instance()
+        self.get_monthly_cost_attribution(usage_metric_api_instance_v1)
+
+        metrics_api_instance = self.get_v1_metrics_api_instance()
+        self.get_usage_this_month(metrics_api_instance)
 
         metric_definitions = self.define_metrics()
         self.add_metrics(metric_definitions, {})
