@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.5.3...v1.6.0) (2024-02-11)
+
+
+### Features
+
+* add methods to query estimated usage per service ([ce639b1](https://github.com/Ebaneck/datadog-cost-exporter/commit/ce639b1bd6a6cecf5749e91e0944be4ce5033080))
+
 ## [1.5.3](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.5.2...v1.5.3) (2024-02-08)
 
 
