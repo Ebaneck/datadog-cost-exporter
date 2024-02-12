@@ -27,11 +27,14 @@ docker run --rm -v $(pwd):/config \
 ### Sample output
 
 ```
+# HELP projected_total_cost The projected total cost for the month.
+# TYPE projected_total_cost gauge
 projected_total_cost{org_name="my-org",public_id="random-uuid",region="eu"} 0.0
-# HELP projected_charge_cost_apm_host The projected cost for apm_host charge.
-# TYPE projected_charge_cost_apm_host gauge
+# HELP historical_charge_cost_apm_host The historical cost for apm_host charge.
 # TYPE historical_charge_cost_apm_host gauge
 historical_charge_cost_apm_host{charge_type="committed",date="2023-12-01 00:00:00+00:00",org_name="my-org",public_id="random-uuid",region="eu"} 5108.07
+# HELP historical_charge_cost_ingested_spans The historical cost for ingested_spans charge.
+# TYPE historical_charge_cost_ingested_spans gauge
 historical_charge_cost_ingested_spans{charge_type="on_demand",date="2023-12-01 00:00:00+00:00",org_name="my-org",public_id="random-uuid",region="eu"} 1916.5
 ```
 
