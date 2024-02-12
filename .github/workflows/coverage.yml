@@ -1,0 +1,36 @@
+name: "Build & Upload coverage report"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  upload-coveralls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+  
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install coverage coveralls freezegun
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          python -m coverage run --branch --source=src,config -m unittest discover -s tests -v
+      
+      - name: Upload coverage report
+        run: |
+          coveralls --service=github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
