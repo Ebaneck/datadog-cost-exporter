@@ -216,15 +216,13 @@ class MetricExporter:
             logging.error(f"Error handling historical cost by organization: {e}")
             return None
 
-    def get_monthly_cost_attribution(self, api_instance: V1UsageMeteringApi) -> None:
+    def get_monthly_cost_attribution(self, api_instance: UsageMeteringApi) -> None:
         try:
             # Get monthly cost attribution
             monthlyCostAttributionResponse: Dict[
                 str, Any
-            ] = api_instance.get_monthly_usage_attribution(
-                start_month=(datetime.now() + relativedelta(days=-3)).isoformat(
-                    timespec="seconds"
-                ),
+            ] = api_instance.get_monthly_cost_attribution(
+                start_month=(datetime.now() + relativedelta(days=-5)),
                 end_month=(datetime.now() + relativedelta(days=-3)),
                 fields="*",
             )
@@ -365,9 +363,7 @@ class MetricExporter:
         usage_metric_api_instance = self.get_usage_metric_api_instance()
         self.get_projected_total_cost(usage_metric_api_instance)
         self.get_historical_cost_by_org(usage_metric_api_instance)
-
-        usage_metric_api_instance_v1 = self.get_v1_usage_metric_api_instance()
-        self.get_monthly_cost_attribution(usage_metric_api_instance_v1)
+        self.get_monthly_cost_attribution(usage_metric_api_instance)
 
         metrics_api_instance = self.get_v1_metrics_api_instance()
         self.get_usage_this_month(metrics_api_instance)
