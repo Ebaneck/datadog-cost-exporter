@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.6.0...v1.6.1) (2024-02-12)
+
+
+### Bug Fixes
+
+* revert to using metering v2 api by default ([3883ac7](https://github.com/Ebaneck/datadog-cost-exporter/commit/3883ac7fb3d069b931bfbe53ffd500ec58337e8f))
+
 # [1.6.0](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.5.3...v1.6.0) (2024-02-11)
 
 
