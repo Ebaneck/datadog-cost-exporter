@@ -25,7 +25,7 @@ def main(config: Dict[str, Any]) -> None:
 
 
 if __name__ == "__main__":
-    logger_format = "%(asctime)-15s %(levelname)-8s %(message)s"
-    logging.basicConfig(level=logging.INFO, format=logger_format)
     config = get_configs()
+    logger_format = "%(asctime)-15s %(levelname)-8s %(message)s"
+    logging.basicConfig(level=config["log_level"], format=logger_format)
     main(config)
