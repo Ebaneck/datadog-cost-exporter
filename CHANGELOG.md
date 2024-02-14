@@ -1,3 +1,11 @@
+## [1.6.2](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.6.1...v1.6.2) (2024-02-14)
+
+
+### Bug Fixes
+
+* allow logging to be configurable ([3f0a8b0](https://github.com/Ebaneck/datadog-cost-exporter/commit/3f0a8b06127159d99a4542fa77ac79558eed3dd2))
+* improve logging ([782fa52](https://github.com/Ebaneck/datadog-cost-exporter/commit/782fa524ef0fdbfadec17e08b7c347e8bfebb749))
+
 ## [1.6.1](https://github.com/Ebaneck/datadog-cost-exporter/compare/v1.6.0...v1.6.1) (2024-02-12)
 
 
