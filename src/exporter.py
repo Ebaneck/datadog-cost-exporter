@@ -3,7 +3,6 @@
 # -*- coding:utf-8 -*-
 # Filename: exporter.py
 
-import logging
 import time
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -29,8 +28,6 @@ from prometheus_client import (
     Info,
 )
 
-logger = logging.getLogger("datadog-cost-exporter")
-
 
 class MetricExporter:
     """
@@ -39,7 +36,13 @@ class MetricExporter:
     """
 
     def __init__(
-        self, polling_interval_seconds, dd_api_key, dd_app_key, dd_host, dd_debug
+        self,
+        polling_interval_seconds,
+        dd_api_key,
+        dd_app_key,
+        dd_host,
+        dd_debug,
+        logger,
     ):
         self.polling_interval_seconds = polling_interval_seconds
         self.dd_api_key = dd_api_key
@@ -48,6 +51,7 @@ class MetricExporter:
         self.dd_debug = dd_debug
         self.default_labels = {}
         self.metrics = {}
+        self.logger = logger
 
     def create_api_client(self) -> ApiClient:
         configuration = Configuration()
@@ -98,14 +102,14 @@ class MetricExporter:
             if metric_name not in self.metrics:
                 self.metrics[metric_name] = metric_object
             else:
-                logging.warning(f"Metric '{metric_name}' already added.")
+                self.logger.warning(f"Metric '{metric_name}' already added.")
 
     def run_metrics_loop(self):
         while True:
             try:
                 self.fetch()
             except Exception as e:
-                logging.error(e)
+                self.logger.error(e)
                 continue
             time.sleep(self.polling_interval_seconds)
 
@@ -169,7 +173,7 @@ class MetricExporter:
                     }
                     metric_object.labels(**labels).set(charge.cost)
         except Exception as e:
-            logging.error(f"Error querying Datadog projected cost endpoint: {e}")
+            self.logger.error(f"Error querying Datadog projected cost endpoint: {e}")
             return None
 
     def get_historical_cost_by_org(self, api_instance: UsageMeteringApi) -> None:
@@ -213,7 +217,7 @@ class MetricExporter:
 
                     metric_object.labels(**labels).set(charge_cost)
         except Exception as e:
-            logging.error(f"Error handling historical cost by organization: {e}")
+            self.logger.error(f"Error handling historical cost by organization: {e}")
             return None
 
     def get_monthly_cost_attribution(self, api_instance: UsageMeteringApi) -> None:
@@ -279,7 +283,7 @@ class MetricExporter:
                 metric_object.labels(**agg_type).set(value)
 
         except Exception as e:
-            logging.error(f"Error handling monthly cost attribution: {e}")
+            self.logger.error(f"Error handling monthly cost attribution: {e}")
             return None
 
     def _query_timeseries_points(
@@ -296,7 +300,7 @@ class MetricExporter:
                 query=query,
             )
         except Exception as e:
-            logging.error(f"Error handling metrics list: {e}")
+            self.logger.error(f"Error handling metrics list: {e}")
             return None
 
     def get_usage_this_month(self, api_instance: V1MetricsApi) -> None:
@@ -358,7 +362,7 @@ class MetricExporter:
         """
         Fetch metrics from the Datadog API.
         """
-        logger.info("Collecting metrics for a Prometheus client")
+        self.logger.info("Collecting metrics for a Prometheus client")
 
         usage_metric_api_instance = self.get_usage_metric_api_instance()
         self.get_projected_total_cost(usage_metric_api_instance)

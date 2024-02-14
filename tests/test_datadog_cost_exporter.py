@@ -16,12 +16,14 @@ class TestMetricExporter(unittest.TestCase):
         self.dd_host = "your_dd_host"
         self.dd_debug = True
         self.polling_interval_seconds = 60
+        self.logger = MagicMock()
         self.metric_exporter = MetricExporter(
             self.polling_interval_seconds,
             self.dd_api_key,
             self.dd_app_key,
             self.dd_host,
             self.dd_debug,
+            self.logger,
         )
 
     def test_create_api_client(self):
@@ -96,6 +98,7 @@ class TestMetricExporter(unittest.TestCase):
             dd_app_key="fake_app_key",
             dd_host="fake_host",
             dd_debug=True,
+            logger=MagicMock(),
         )
 
         api_instance.get_projected_cost.return_value = MagicMock()
